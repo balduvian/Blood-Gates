@@ -45,20 +45,16 @@ public class Enemy extends Blob {
 
         lineTransform = new Transform();
 
+        angle = (float)lineAngle + CNGE.PI / 2;
         nextAngle = (float)(Math.random() * Math.PI * 2);
 
         spawnTimer = new Timer(0.5f);
-        moveTimer = new Timer(0.5f);
+        moveTimer = new Timer(MIN_MOVE_TIME);
         spawnTimer.start();
     }
 
-    //public Enemy(float x, float y, float r, int i) {
-    //    super(x, y, r);
-    //    enemyIndex = i;
-    //}
-
     public void resetMoveTimer() {
-        moveTimer.setTime((Math.random() * MAX_MOVE_TIME - MIN_MOVE_TIME) + MIN_MOVE_TIME);
+        moveTimer.setTime((Math.random() * (MAX_MOVE_TIME - MIN_MOVE_TIME)) + MIN_MOVE_TIME);
     }
 
     @Override
@@ -118,7 +114,23 @@ public class Enemy extends Blob {
             along = 0;
         }
 
-        lineTransform.rotation = Timer.LINEAR.interpolate(angle, nextAngle, along) + CNGE.PI / 2;
+        double startAngle = angle;
+        if(startAngle > Math.PI * 2) {
+            startAngle -= Math.PI * 2;
+        } else if(startAngle < 0) {
+            startAngle += Math.PI * 2;
+        }
+        double endAngle = nextAngle;
+        if(endAngle < Math.PI) {
+            if (angle > nextAngle + Math.PI) {
+                startAngle = angle - (Math.PI * 2);
+            }
+        } else {
+            if (angle < nextAngle - Math.PI) {
+                startAngle = angle + (Math.PI * 2);
+            }
+        }
+        lineTransform.rotation = Timer.LINEAR.interpolate(startAngle, nextAngle, along) + CNGE.PI / 2;
 
         GameAssets.colorShader.enable();
         GameAssets.colorShader.setUniforms(0, 0, 0, 0.5f);
