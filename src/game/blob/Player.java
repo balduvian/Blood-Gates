@@ -113,7 +113,7 @@ public class Player extends Blob {
             float dy = (float) (Math.sin(angle) * speedStep);
 
             ColPackage pack = movement(map, dx, dy, growing);
-            collided = pack.bestCollision != null;
+            collided = pack.colMode != ColPackage.NO_COLLISION;
 
             if(radius >= map.getBloodCost() && pack.bestWall == map.getGateLine()) {
                 winning = true;

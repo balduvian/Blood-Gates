@@ -120,7 +120,6 @@ public class CCD {
             y *= l / len;
             return this;
         }
-
     }
 
     public static class Collision {

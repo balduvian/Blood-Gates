@@ -364,7 +364,7 @@ public class GameScene extends Scene {
         GameAssets.mapBuffer.enableTexture();
         window.clear(1, 1, 1, 1);
         Transform t = camera.getTransform();
-        currentMap.render(t.x, t.y, t.width + t.x, t.height + t.y, true, false);
+        currentMap.render(t.x, t.y, t.getInverseWidth() + t.x, t.getInverseHeight() + t.y, true, false);
 
         GameAssets.drawBuffer.enableTexture();
         window.clear(0, 0, 0, 1);
@@ -398,7 +398,7 @@ public class GameScene extends Scene {
         GameAssets.mapShader.setUniforms(new Vector4f(1, 1, 0, 0), 1f, 1f, 1f, 0, 1, 0);
         GameAssets.rect.render();
 
-        currentMap.render(t.x, t.y, t.width + t.x, t.height + t.y, false, true);
+        currentMap.render(t.x, t.y, t.getInverseWidth() + t.x, t.getInverseHeight() + t.y, false, true);
 
         if(player != null) {
             player.arrowRender();

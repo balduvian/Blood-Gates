@@ -12,16 +12,24 @@ import static org.lwjgl.glfw.GLFW.*;
 abstract public class Blob {
 
 	public static class ColPackage {
-		public CCD.Collision bestCollision;
+		public static final int NO_COLLISION = 0;
+		public static final int LINE_COLLISION = 1;
+		public static final int CIRCLE_COLLISION = 2;
+
+		public int colMode;
 		public Map.Line bestWall;
 		public double wallAngle;
 		public double bestT;
+		public float cx;
+		public float cy;
 
 		public ColPackage() {
-			bestCollision = null;
+			colMode = 0;
 			bestWall = null;
 			wallAngle = 0;
 			bestT = 2;
+			cx = 0;
+			cy = 0;
 		}
 	}
 
@@ -108,32 +116,42 @@ abstract public class Blob {
 
 						CCD.Line colLine = new CCD.Line(line.x0 + off.x, line.y0 + off.y, line.x1 + off.x, line.y1 + off.y);
 
-						boolean colFound = false;
 						double effectiveT = 2;
+						int nowMode = ColPackage.NO_COLLISION;
+						float cx = 0;
+						float cy = 0;
 
 						double circleStartT = CCD.circleCollision(growMove, line.x0, line.y0, radius);
 						if (CCD.inline(circleStartT) && circleStartT < effectiveT) {
 							effectiveT = circleStartT;
-							colFound = true;
+							nowMode = ColPackage.CIRCLE_COLLISION;
+							cx = line.x0;
+							cy = line.y0;
 						}
 
 						double circleEndT = CCD.circleCollision(growMove, line.x1, line.y1, radius);
 						if (CCD.inline(circleEndT) && circleEndT < effectiveT) {
 							effectiveT = circleEndT;
-							colFound = true;
+							nowMode = ColPackage.CIRCLE_COLLISION;
+							cx = line.x1;
+							cy = line.y1;
 						}
 
 						CCD.Collision col = CCD.result(growMove, colLine);
 						if (CCD.inline(col.t_) && col.collision() && col.t_ < effectiveT) {
 							effectiveT = col.t_;
-							colFound = true;
+							nowMode = ColPackage.LINE_COLLISION;
 						}
 
-						if (colFound && effectiveT < colPackage.bestT) {
-							colPackage.bestCollision = col;
-							colPackage.wallAngle = tempWallAngle;
+						if (nowMode != ColPackage.NO_COLLISION && effectiveT < colPackage.bestT) {
+							colPackage.colMode = nowMode;
+							colPackage.wallAngle = (nowMode == ColPackage.LINE_COLLISION) ?
+								tempWallAngle :
+								Math.atan2(CCD.yAlong(effectiveT, move) - cy, CCD.xAlong(effectiveT, move) - cx) + Math.PI / 2;
 							colPackage.bestWall = l;
-							colPackage.bestT = col.t_;
+							colPackage.bestT = effectiveT;
+							colPackage.cx = cx;
+							colPackage.cy = cy;
 						}
 					}
 				}
@@ -143,12 +161,7 @@ abstract public class Blob {
 		x = growMove.x0;
 		y = growMove.y0;
 
-		if (colPackage.bestCollision != null) {
-
-			if(colPackage.bestT < 0) {
-				System.exit(0);
-			}
-
+		if (colPackage.colMode != ColPackage.NO_COLLISION) {
 			double colX = CCD.xAlong(colPackage.bestT - 0.01f, growMove);
 			double colY = CCD.yAlong(colPackage.bestT - 0.01f, growMove);
 
