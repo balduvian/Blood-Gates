@@ -13,12 +13,11 @@ import static cnge.graphics.texture.TexturePreset.TP;
 
 public class GameAssets extends AssetBundle {
 
-    public static final int GAME_ASSETS_LOAD_NUMBER = 26;
+    public static final int GAME_ASSETS_LOAD_NUMBER = 25;
 
     /*
      *
      */
-    public static Texture lagTexture;
     public static CircleShape circle;
     public static TriangleShader triangleShader;
     public static FrameBuffer drawBuffer;
@@ -54,7 +53,6 @@ public class GameAssets extends AssetBundle {
 
     @Override
     public void loadRoutine() {
-        doLoad(lagTexture = new Texture("res/icon.png", TP()));
         doLoad(circle = new CircleShape(16));
         doLoad(triangleShader = new TriangleShader());
         doLoad(drawBuffer = new FrameBuffer(new Texture(1, 1), false));
@@ -84,7 +82,6 @@ public class GameAssets extends AssetBundle {
 
     @Override
     public void unloadRoutine() {
-        doLoad(lagTexture.destroy());
         doLoad(circle.destroy());
         doLoad(triangleShader.destroy());
         doLoad(drawBuffer.destroy());
