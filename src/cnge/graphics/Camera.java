@@ -39,12 +39,18 @@ public class Camera extends CNGE {
 	 * you need to do this after every transformation or else things won't loadRender with the new camera transformation
 	 */
 	public void update() {
+		//projectionView = new Matrix4f();
+		//projectionView = projectionView.mul(projection);
+		//projectionView = projectionView.translate(transform.width / 2, transform.height / 2, 0);
+		//projectionView = projectionView.scale(transform.wScale, transform.hScale, 1);
+		//projectionView = projectionView.rotateZ(-transform.rotation);
+		//projectionView = projectionView.translate(-transform.width / 2 - transform.x, -transform.height / 2 - transform.y, 0);
+
 		projectionView = new Matrix4f();
 		projectionView = projectionView.mul(projection);
-		projectionView = projectionView.translate(transform.width / 2, transform.height / 2, 0);
 		projectionView = projectionView.scale(transform.wScale, transform.hScale, 1);
 		projectionView = projectionView.rotateZ(-transform.rotation);
-		projectionView = projectionView.translate(-transform.width / 2 - transform.x, -transform.height / 2 - transform.y, 0);
+		projectionView = projectionView.translate(-transform.x, -transform.y, 0);
 	}
 	
 	/**

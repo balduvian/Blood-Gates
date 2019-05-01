@@ -65,11 +65,12 @@ abstract public class Blob {
 		Transform ct = CNGE.camera.getTransform();
 
 		ct.setScale((float)zoom, (float)zoom);
-		ct.setCenter(x, y);
+		ct.setInverseCenter(x, y);
 	}
 
-	protected ColPackage movement(Map map, float dx, float dy) {
+	protected ColPackage movement(Map map, float dx, float dy, boolean gr) {
 		CCD.Line move = new CCD.Line(x, y, x + dx, y + dy);
+		CCD.Line growMove = new CCD.Line(move);
 
 		ColPackage colPackage = new ColPackage();
 
@@ -87,6 +88,17 @@ abstract public class Blob {
 						CCD.Vector wv = new CCD.Vector(line);
 						double tempWallAngle = wv.getAngle();
 
+						//grow prevention
+						if(gr) {
+							double[] circs = CCD.circleCollisions(line, x, y, radius);
+							if(CCD.eitherInRange(circs)) {
+								CCD.Vector push = CCD.moveCircle(line, circs, x, y, radius);
+								growMove.copy(move);
+								growMove.add(push);
+							}
+						}
+						//
+
 						CCD.Vector off = new CCD.Vector(radius, 0);
 						if (CCD.normalSide(l.line, x, y)) {
 							off.rotate(tempWallAngle - CNGE.PI / 2);
@@ -99,20 +111,20 @@ abstract public class Blob {
 						boolean colFound = false;
 						double effectiveT = 2;
 
-						double circleStartT = CCD.circleCollision(move, line.x0, line.y0, radius);
+						double circleStartT = CCD.circleCollision(growMove, line.x0, line.y0, radius);
 						if (CCD.inline(circleStartT) && circleStartT < effectiveT) {
 							effectiveT = circleStartT;
 							colFound = true;
 						}
 
-						double circleEndT = CCD.circleCollision(move, line.x1, line.y1, radius);
+						double circleEndT = CCD.circleCollision(growMove, line.x1, line.y1, radius);
 						if (CCD.inline(circleEndT) && circleEndT < effectiveT) {
 							effectiveT = circleEndT;
 							colFound = true;
 						}
 
-						CCD.Collision col = CCD.result(move, colLine);
-						if (col.collision() && col.t_ < effectiveT) {
+						CCD.Collision col = CCD.result(growMove, colLine);
+						if (CCD.inline(col.t_) && col.collision() && col.t_ < effectiveT) {
 							effectiveT = col.t_;
 							colFound = true;
 						}
@@ -128,9 +140,17 @@ abstract public class Blob {
 			}
 		}
 
+		x = growMove.x0;
+		y = growMove.y0;
+
 		if (colPackage.bestCollision != null) {
-			double colX = CCD.xAlong(colPackage.bestT - 0.01f, move);
-			double colY = CCD.yAlong(colPackage.bestT - 0.01f, move);
+
+			if(colPackage.bestT < 0) {
+				System.exit(0);
+			}
+
+			double colX = CCD.xAlong(colPackage.bestT - 0.01f, growMove);
+			double colY = CCD.yAlong(colPackage.bestT - 0.01f, growMove);
 
 			dx = (float) (colX - x);
 			dy = (float) (colY - y);

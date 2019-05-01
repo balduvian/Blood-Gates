@@ -89,7 +89,7 @@ public class Enemy extends Blob {
             float dx = (float)(speedStep * Math.cos(angle));
             float dy = (float)(speedStep * Math.sin(angle));
 
-            ColPackage pack = movement(map, dx, dy);
+            ColPackage pack = movement(map, dx, dy, false);
         }
     }
 

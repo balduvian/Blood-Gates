@@ -55,6 +55,11 @@ public class Player extends Blob {
     }
 
     public void update(Map map) {
+
+        if(CNGE.window.keyPressed(GLFW_KEY_SPACE)) {
+            growBy(0.5f);
+        }
+
         if(winning) {
             winTimer.update(Loop.time);
             double along = winTimer.getAlong();
@@ -94,39 +99,39 @@ public class Player extends Blob {
 
             boolean collided = false;
 
+            if(growing) {
+                radius = Timer.LINEAR.interpolate(oldRadius, goingToBeRadius, growTimer.getAlong());
+            }
+
             if (speed < 0) {
                 speed = 0;
             }
-            if (speed > 0) {
-                double speedStep = speed * Loop.time;
 
-                float dx = (float) (Math.cos(angle) * speedStep);
-                float dy = (float) (Math.sin(angle) * speedStep);
+            double speedStep = speed * Loop.time;
 
-                ColPackage pack = movement(map, dx, dy);
-                collided = pack.bestCollision != null;
+            float dx = (float) (Math.cos(angle) * speedStep);
+            float dy = (float) (Math.sin(angle) * speedStep);
 
-                if(radius >= map.getBloodCost() && pack.bestWall == map.getGateLine()) {
-                    winning = true;
-                    winTimer.start();
-                    CCD.Line l = pack.bestWall.line;
+            ColPackage pack = movement(map, dx, dy, growing);
+            collided = pack.bestCollision != null;
 
-                    CCD.Vector wv = new CCD.Vector(l);
-                    float cx = wv.getCenterX();
-                    float cy = wv.getCenterY();
+            if(radius >= map.getBloodCost() && pack.bestWall == map.getGateLine()) {
+                winning = true;
+                winTimer.start();
+                CCD.Line l = pack.bestWall.line;
 
-                    CCD.Vector mv = new CCD.Vector(radius, 0);
-                    mv.rotate(pack.wallAngle - CNGE.PI / 2);
+                CCD.Vector wv = new CCD.Vector(l);
+                float cx = wv.getCenterX();
+                float cy = wv.getCenterY();
 
-                    winLine = new CCD.Line(x, y, cx + mv.x + l.x0, cy + mv.y + l.y0);
+                CCD.Vector mv = new CCD.Vector(radius, 0);
+                mv.rotate(pack.wallAngle - CNGE.PI / 2);
 
-                    epic_win = true;
-                }
+                winLine = new CCD.Line(x, y, cx + mv.x + l.x0, cy + mv.y + l.y0);
+
+                epic_win = true;
             }
 
-            if (growing && !collided) {
-                radius = Timer.LINEAR.interpolate(oldRadius, goingToBeRadius, growTimer.getAlong());
-            }
         }
     }
 

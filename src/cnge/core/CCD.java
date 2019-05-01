@@ -12,11 +12,32 @@ public class CCD {
             this.y1 = y1;
         }
 
+        public Line(Line l) {
+            x0 = l.x0;
+            y0 = l.y0;
+            x1 = l.x1;
+            y1 = l.y1;
+        }
+
         public Line() {
             x0 = 0;
             y0 = 0;
             x1 = 0;
             y1 = 0;
+        }
+
+        public void copy(Line l) {
+            x0 = l.x0;
+            x1 = l.x1;
+            y0 = l.y0;
+            y1 = l.y1;
+        }
+
+        public void add(Vector v) {
+            x0 += v.x;
+            x1 += v.x;
+            y0 += v.y;
+            y1 += v.y;
         }
     }
 
@@ -140,6 +161,38 @@ public class CCD {
         double a = nm.x1 * nm.x1 - 2 * nm.x1 * nm.x0 + nm.x0 * nm.x0 + nm.y1 * nm.y1 - 2 * nm.y1 * nm.y0 + nm.y0 * nm.y0;
 
         return (-b - Math.sqrt(b * b - 4 * a * c)) / (2 * a);
+    }
+
+    public static double[] circleCollisions(Line move, double cx, double cy, double r) {
+        Line nm = new Line((float)(move.x0 - cx), (float)(move.y0 - cy), (float)(move.x1 - cx), (float)(move.y1 - cy));
+
+        double c = nm.x0 * nm.x0 + nm.y0 * nm.y0 - r * r;
+        double b = 2 * (nm.x1 * nm.x0 - nm.x0 * nm.x0 + nm.y1 * nm.y0 - nm.y0 * nm.y0);
+        double a = nm.x1 * nm.x1 - 2 * nm.x1 * nm.x0 + nm.x0 * nm.x0 + nm.y1 * nm.y1 - 2 * nm.y1 * nm.y0 + nm.y0 * nm.y0;
+
+        double root = Math.sqrt(b * b - 4 * a * c);
+        double t0 = (-b - root) / (2 * a);
+        double t1 = (-b + root) / (2 * a);
+
+        return new double[] {t0, t1};
+    }
+
+    public static boolean eitherInRange(double[] ts) {
+        return (ts[0] > 0 && ts[0] < 1) || (ts[1] > 0 && ts[1] < 1);
+    }
+
+    public static CCD.Vector moveCircle(Line wall, double[] circ, double cx, double cy, double r) {
+        double t3 = (circ[0] + circ[1]) / 2;
+
+        double wx = xAlong(t3, wall);
+        double wy = yAlong(t3, wall);
+
+        Vector toCenter = new Vector((float)(cx - wx), (float)(cy - wy));
+
+        double len = toCenter.length();
+        double addTo = r - len;
+
+        return toCenter.multiply((addTo / len) + 0.01);
     }
 
     public static boolean inline(double t) {

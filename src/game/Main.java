@@ -32,7 +32,7 @@ public class Main extends CNGE {
 
 		initGameSize(256, 144);
 		initScreenMode(Screen.makeAspectScreen(), -1);
-		initWindow(new Window().initFull(true).initName("here we go").initIcon("res/icon.png").init());
+		initWindow(new Window().initFull(false).initName("here we go").initIcon("res/icon.png").init());
 		initLoopers(this::updateRender, this::loadRender);
 		initAssetBundles(new GameAssets());
 		initDebug(false);

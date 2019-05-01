@@ -149,5 +149,10 @@ public class Transform {
 		x = o - (width / 2);
 		y = a - (height / 2);
 	}
+
+	public void setInverseCenter(float o, float a) {
+		x = o - (getInverseWidth() / 2);
+		y = a - (getInverseHeight() / 2);
+	}
 	
 }
