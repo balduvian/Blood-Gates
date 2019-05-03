@@ -8,11 +8,9 @@ import cnge.graphics.Transform;
 import game.GameAssets;
 import game.GameScene;
 import game.Map;
-import game.GameAssets;
 import org.joml.Vector2f;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
 
 public class Player extends Blob {
 
@@ -55,11 +53,6 @@ public class Player extends Blob {
     }
 
     public void update(Map map) {
-
-        if(CNGE.window.keyPressed(GLFW_KEY_SPACE)) {
-            growBy(0.5f);
-        }
-
         if(winning) {
             winTimer.update(Loop.time);
             double along = winTimer.getAlong();
@@ -85,7 +78,7 @@ public class Player extends Blob {
                 } else {
                     if (CNGE.window.mousePressed(GLFW_MOUSE_BUTTON_1)) {
                         flingMode = true;
-                        Vector2f mouse = CNGE.window.getMouseCoords(CNGE.camera);
+                        Vector2f mouse = CNGE.window.getCursorWorld();
                         mStartX = mouse.x;
                         mStartY = mouse.y;
                         doArrow();
@@ -158,7 +151,7 @@ public class Player extends Blob {
     }
 
     private void doArrow() {
-        Vector2f mouse = CNGE.window.getMouseCoords(CNGE.camera);
+        Vector2f mouse = CNGE.window.getCursorWorld();
         mFlingX = mouse.x;
         mFlingY = mouse.y;
         flingVec = new CCD.Vector(mFlingX - mStartX, mFlingY - mStartY);
@@ -190,13 +183,13 @@ public class Player extends Blob {
     }
 
     public void arrowRender() {
-        if(flingMode) {
-            arrowTransform.setSize(10, (float)flingVec.length());
+        if(flingMode && !epic_win) {
+            arrowTransform.setSize(radius * 2, (float)flingVec.length());
             arrowTransform.setCenter(x + flingVec.getCenterX(), y + flingVec.getCenterY());
             arrowTransform.rotation = (float)flingVec.getAngle() + CNGE.PI / 2;
-            GameAssets.colorShader.enable();
-            GameAssets.colorShader.setUniforms(1, 1, 1, 0.5f);
-            GameAssets.colorShader.setMvp(CNGE.camera.getMVP(CNGE.camera.getM(arrowTransform)));
+            GameAssets.gradientShader.enable();
+            GameAssets.gradientShader.setUniforms(1, 1, 1, 0.5f, 1, 1, 1, 0f);
+            GameAssets.gradientShader.setMvp(CNGE.camera.getMVP(CNGE.camera.getM(arrowTransform)));
             GameAssets.arrowShape.render();
         }
     }

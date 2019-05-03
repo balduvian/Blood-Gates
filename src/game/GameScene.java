@@ -56,6 +56,8 @@ public class GameScene extends Scene {
      * we get here from menu, runs once per game at the start
      */
     public void sceneStart() {
+        CNGE.window.infiniteCursor();
+
         Map.setupBloodMaps();
 
         startingLevel = new Level(

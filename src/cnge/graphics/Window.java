@@ -224,6 +224,10 @@ public class Window extends CNGE {
 	public void hideCursor() {
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	}
+
+	public void infiniteCursor() {
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
 	
 	public void setIcon(String imagePath) {
 		
@@ -319,19 +323,33 @@ public class Window extends CNGE {
 	    // set current cursor
 	    glfwSetCursor(window, cursorID);
 	}
-	
-	public Vector2f getMouseCoords(Camera c) {
+
+	public void setCursorWorld(double x, double y) {
+		Transform t = camera.getTransform();
+		double wx = (screen.getFrameWidth() * (x - t.x)) / t.getInverseWidth() + (width - screen.getFrameWidth()) / 2;
+		double wy = (screen.getFrameHeight() * (y - t.y)) / t.getInverseHeight() + (height - screen.getFrameHeight()) / 2;
+		glfwSetCursorPos(window, x, y);
+	}
+
+	public Vector2f getCursorWorld() {
 		double[] x = new double[1];
 		double[] y = new double[1];
 		glfwGetCursorPos(window, x, y);
-		Vector2f ret = new Vector2f((float)x[0], (float)y[0]);
-		Transform t = c.getTransform();
-		ret.mul(t.getInverseWidth()/screen.getFrameWidth(), t.getInverseHeight()/screen.getFrameHeight());
-		//ret.x += (width - screen.getFrameWidth()) / ( 2 * CNGE.gameWidth / screen.getFrameWidth());
-		//ret.y += (height - screen.getFrameHeight()) / ( 2 * CNGE.gameWidth / screen.getFrameHeight());
-		//System.out.println((width - screen.getFrameWidth()) / ( 2 * CNGE.gameWidth / screen.getFrameWidth()));
-		//System.out.println(width - screen.getFrameWidth());
-		return ret;
+		Transform t = camera.getTransform();
+		return new Vector2f(
+			(float)((x[0] - (( width -  screen.getFrameWidth()) / 2)) *  t.getInverseWidth()) /  screen.getFrameWidth(),
+			(float)((y[0] - ((height - screen.getFrameHeight()) / 2)) * t.getInverseHeight()) / screen.getFrameHeight()
+		);
+	}
+
+	public Vector2f getCursorScreen() {
+		double[] x = new double[1];
+		double[] y = new double[1];
+		glfwGetCursorPos(window, x, y);
+		return new Vector2f(
+			(float)((x[0] - (( width -  screen.getFrameWidth()) / 2)) *  gameWidth) /  screen.getFrameWidth(),
+			(float)((y[0] - ((height - screen.getFrameHeight()) / 2)) * gameHeight) / screen.getFrameHeight()
+		);
 	}
 	
 	public boolean mousePressed(int button) {

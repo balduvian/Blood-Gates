@@ -1,13 +1,8 @@
 package game;
 
 import cnge.core.*;
-import cnge.graphics.Camera;
 import cnge.graphics.Transform;
-import cnge.graphics.shape.RectShape;
-import cnge.graphics.texture.Texture;
 import org.joml.Vector2f;
-
-import java.awt.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -39,6 +34,7 @@ public class MenuScene extends Scene {
 
 	@Override
 	public void sceneStart() {
+		CNGE.window.showCursor();
 		renderT = new Transform();
 		playButton = new Button(38,  56, 180, 32, GameAssets.healthBuffer,   true);
 		helpButton = new Button(38, 104, 180, 32, GameAssets.healthBuffer2,  true);
@@ -262,7 +258,7 @@ public class MenuScene extends Scene {
 		rotation += Loop.time * speed;
 		rotation %= 2 * CNGE.PI;
 
-		Vector2f mouse = window.getMouseCoords(camera);
+		Vector2f mouse = window.getCursorWorld();
 		float mx = mouse.x;
 		float my = mouse.y;
 		boolean down = window.mousePressed(GLFW_MOUSE_BUTTON_1);

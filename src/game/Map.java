@@ -285,9 +285,6 @@ public class Map {
                         break;
                     case 6:
                         h = getInt(current, '"', rs, -10);
-                        if(rs.success) {
-                            System.out.println(h);
-                        }
                         break;
 
                     case 7: //find the next line or polygon
